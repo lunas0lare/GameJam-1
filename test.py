@@ -5,11 +5,24 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 class gameState():
     def __init__(self):
-        self.tankPos = #this also
+        self.mePos = Vector2(240, 240)
         #put create window here, use vector(x, y)(this is a class)
-    def update(self, moveCommandX, moveCommandY):
-        self.x += moveCommandX
-        self.y += moveCommandY
+        self.windowPos = Vector2(1000, 800)
+        
+        self.meSize = Vector2(28,16)
+    def update(self, Movement):
+        if(self.mePos.x < 0):
+            self.mePos.x = 0
+        elif self.mePos.x > self.windowPos.x:
+            self.mePos.x = self.windowPos.x - self.meSize.x
+
+        a = self.windowPos.y - self.meSize.y
+        if(self.mePos.y < 0):
+            self.mePos.y = 0
+        elif self.mePos.y > self.windowPos.y:
+            self.mePos.y = a
+        self.mePos.x += Movement.x
+        self.mePos.y += Movement.y
 
 
 class Game():
@@ -17,18 +30,22 @@ class Game():
         self.moveSpeed = 10
         pygame.init()
         self.gameState = gameState()
-        self.window = pygame.display.set_mode((1920, 1080))#move up gamestate
-        self.unit = pygame.image.load('trash assets/box 1.png')
-        pygame.display.set_caption("Discover Python & Patterns - https://www.patternsgameprog.com")
-        self.clock = pygame.time.Clock()
-        self.moveCommandX = 0
-        self.moveCommandY = 0
 
+        self.window = pygame.display.set_mode(self.gameState.windowPos)
+
+        self.main = pygame.image.load('trash assets/box 1.png')
+        self.mob = pygame.image.load('trash assets/recycling 1.png')
+
+        pygame.display.set_caption("TrashCanDoIt")
+        self.clock = pygame.time.Clock()
+
+        self.mobs_movement = Vector2(0,0)
+        self.meMovement = Vector2(0,0)
         self.running = True
     
     def processInput(self):
-        self.moveCommandX = 0
-        self.moveCommandY = 0#convert into vector
+        self.meMovement = Vector2(0,0)
+        
         for event in pygame.event.get():
             pygame.key.set_repeat(1, self.moveSpeed)
             if event.type == pygame.QUIT:
@@ -41,23 +58,25 @@ class Game():
                     self.running = False
                     break
                 elif event.key == pygame.K_RIGHT:
-                    self.moveCommandX = 10
+                    self.meMovement.x = 10
                 elif event.key == pygame.K_LEFT:
-                    self.moveCommandX = -10
+                    self.meMovement.x = -10
                 elif event.key == pygame.K_DOWN:
-                    self.moveCommandY = 10
+                    self.meMovement.y = 10
                 elif event.key == pygame.K_UP:
-                    self.moveCommandY = -10
+                    self.meMovement.y = -10
                     
     def update(self):
-       self.gameState.update(self.moveCommandX, self.moveCommandY)#when convert into vector, only need to truyen vao class
+        self.gameState.update(self.meMovement)#when convert into vector, only need to truyen vao class
 
     def render(self):
         self.window.fill((0,0,0))
-        x = self.gameState.x
-        y = self.gameState.y
-        self.location = pygame.math.Vector2(self.gameState.x, self.gameState.y)
-        self.window.blit(self.unit, pygame.math.Vector2(x, y))
+        x = self.gameState.mePos.x
+        y = self.gameState.mePos.y
+        self.location = pygame.math.Vector2(x, y)
+        self.window.blit(self.main, self.location)
+        self.mobs_movement.x += 5
+        self.window.blit(self.mob, pygame.math.Vector2(self.mobs_movement.x, self.mobs_movement.y))
         pygame.display.update()
         
     def run(self):

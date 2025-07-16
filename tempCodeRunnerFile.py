@@ -1,7 +1,4 @@
-import pygame
-
-pygame.init()
-window = pygame.display.set_mode((1920, 1080))
-window.fill((0,0,0))
-pygame.image.load('trash assets/alcohol 1.png')
-pygame.display.update()
+self.meMovement.x < 0):
+        #    self.meMovement.x = 0
+        # if(self.meMovement.y < 0):
+        #    self.meMovement.y = 0
