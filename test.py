@@ -16,7 +16,7 @@ class me(unit):
     def __init__(self, location, rect):
        super().__init__(location, rect)
     
-    def move(self, location, Movement):
+    def move(self, Movement):
         if(self.location.x < 0):
             self.location.x = 0
             
@@ -34,19 +34,16 @@ class mob(unit):
     def __init__(self,location, rect):
        super().__init__(location, rect)
     
-    def move(self, location, Movement):
+    def move(self, Movement: int):
         self.location.y += Movement
-    # self.mobs_movement.x += self.modMovementSpeed
-        # if(self.gameState.handleCollision(self.me_rect, self.mob_rect) == True):
-        #     self.mobs_movement.y = randint(0, 100)
+        
 
 class handling_things():
     def __init__(self):
         pass
     def handle_collision(self, me: unit, mob: unit):
         if(me.rect.colliderect(mob.rect) == True):
-            print('nice')
-            mob.move(randint(0, 100))
+            mob.move(randint(-100, 100))
 
 
 class Game():
@@ -75,7 +72,7 @@ class Game():
         self.clock = pygame.time.Clock()
 
         #creating movement variables
-        self.mobs_movement = Vector2(0,0)
+        self.mobsMovement = Vector2(0,0)
         self.meMovement = Vector2(0,0)
 
         #creating rectangle for collision and rendering
@@ -83,7 +80,7 @@ class Game():
         self.meLocation = pygame.math.Vector2(500, 500)
         self.me_rect = self.window.blit(self.main, self.meLocation)#location of me object x = y = 500
 
-        self.mobLocation = pygame.math.Vector2(700, 700)
+        self.mobLocation = pygame.math.Vector2(700, 400)
         self.mob_rect = self.window.blit(self.mob, self.mobLocation)
         
         self.unit = [
@@ -116,20 +113,18 @@ class Game():
                     self.meMovement.y = -self.meMovementSpeed
                     
     def update(self):
-        self.unit[0].move(self.meLocation, self.meMovement)#when convert into vector, only need to truyen vao class
-        self.mobs_movement.x += self.modMovementSpeed
+        self.unit[0].move(self.meMovement)#when convert into vector, only need to truyen vao class
+        # self.mobsMovement.y = 1
         self.handle_object.handle_collision(self.unit[0], self.unit[1])
 
     def render(self):
         self.window.fill((0,0,0))
-        x = self.meLocation.x
-        y = self.meLocation.y
-        self.location = pygame.math.Vector2(x, y)
 
-        self.me_rect = self.window.blit(self.main, self.location)
-        
-        self.mob_rect = self.window.blit(self.mob, pygame.math.Vector2(self.mobs_movement.x, self.mobs_movement.y))
-        
+        self.me_rect = self.window.blit(self.main, (self.unit[0].location.x, self.unit[0].location.y))
+        self.unit[0].rect = self.me_rect
+        self.mob_rect = self.window.blit(self.mob, (self.unit[1].location.x, self.unit[1].location.y))
+        self.unit[1].rect = self.mob_rect
+       
         pygame.display.update()
         
     def run(self):
