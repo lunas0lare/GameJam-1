@@ -6,70 +6,65 @@ from random import randint
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 class unit():
-    def __init__(self, state, pos, rect):
-        self.state = state
-        self.pos = pos
+    def __init__(self, location, rect):
+        self.location = location
         self.rect = rect
     def move(self, Movement):
         raise NotImplementedError()
     
 class me(unit):
-    def __init__(self, rect):
-       state = gameState()
-       pos = state.pos
-       super().__init__(state, pos, rect)
+    def __init__(self, location, rect):
+       super().__init__(location, rect)
     
-    def move(self, Movement):
-        if(self.pos.x < 0):
-            self.pos.x = 0
-        elif self.pos.x > self.windowPos.x:
-            self.pos.x = self.windowPos.x - self.meSize.x
+    def move(self, location, Movement):
+        if(self.location.x < 0):
+            self.location.x = 0
+            
+        elif self.location.x > windowPos.x:
+            self.location.x = windowPos.x - self.rect.width
 
-        if(self.pos.y < 0):
-            self.pos.y = 0
-        elif self.pos.y > self.windowPos.y:
-            self.pos.y = self.windowPos.y - self.meSize.y
-        self.pos.x += Movement.x
-        self.pos.y += Movement.y
+        if(self.location.y < 0):
+            self.location.y = 0
+        elif self.location.y > windowPos.y:
+            self.location.y = windowPos.y - self.rect.height
+        self.location.x += Movement.x
+        self.location.y += Movement.y
         
 class mob(unit):
-    def __init__(self, rect):
-       state = gameState()
-       pos = state.pos
-       super().__init__(state, pos, rect)
+    def __init__(self,location, rect):
+       super().__init__(location, rect)
     
-    def move(self, Movement):
-        
+    def move(self, location, Movement):
+        self.location.y += Movement
     # self.mobs_movement.x += self.modMovementSpeed
-        if(self.gameState.handleCollision(self.me_rect, self.mob_rect) == True):
-            self.mobs_movement.y = randint(0, 100)
+        # if(self.gameState.handleCollision(self.me_rect, self.mob_rect) == True):
+        #     self.mobs_movement.y = randint(0, 100)
 
-class gameState():
+class handling_things():
     def __init__(self):
-        self.pos = Vector2(240, 240)
-        #put create window here, use vector(x, y)(this is a class)
-        self.windowPos = Vector2(1000, 800)
-        
-        self.meSize = Vector2(28,16)
-    def update(self, Movement):
-        for unit in self.units:
-        me.move(self, Movement)
-        
-    def handleCollision(self, main_rect, mob_rect):
-        if(main_rect.colliderect(mob_rect)):
-            return True
+        pass
+    def handle_collision(self, me: unit, mob: unit):
+        if(me.rect.colliderect(mob.rect) == True):
+            print('nice')
+            mob.move(randint(0, 100))
+
 
 class Game():
+    
     def __init__(self):
         #frame per second
         self.FPS = 10
         #movement speed of object
         self.meMovementSpeed = 6
         self.modMovementSpeed = 2
-        pygame.init()
-        self.gameState = gameState()
 
-        self.window = pygame.display.set_mode(self.gameState.windowPos)
+        global windowPos 
+        windowPos = Vector2(1080, 800)
+        pygame.init()
+        
+        self.handle_object = handling_things()
+
+        self.window = pygame.display.set_mode(windowPos)
 
         #loading object
         self.main = pygame.image.load('trash assets/box 1.png').convert_alpha()
@@ -84,12 +79,17 @@ class Game():
         self.meMovement = Vector2(0,0)
 
         #creating rectangle for collision and rendering
+        
         self.meLocation = pygame.math.Vector2(500, 500)
         self.me_rect = self.window.blit(self.main, self.meLocation)#location of me object x = y = 500
 
-        self.mobLocation = pygame.math.Vector2(500, 700)
+        self.mobLocation = pygame.math.Vector2(700, 700)
         self.mob_rect = self.window.blit(self.mob, self.mobLocation)
-
+        
+        self.unit = [
+            me(self.meLocation, self.me_rect),
+            mob(self.mobLocation, self.mob_rect)
+                     ]
         self.running = True
     
     def processInput(self):
@@ -116,13 +116,14 @@ class Game():
                     self.meMovement.y = -self.meMovementSpeed
                     
     def update(self):
-        self.gameState.update(self.meMovement)#when convert into vector, only need to truyen vao class
+        self.unit[0].move(self.meLocation, self.meMovement)#when convert into vector, only need to truyen vao class
         self.mobs_movement.x += self.modMovementSpeed
+        self.handle_object.handle_collision(self.unit[0], self.unit[1])
 
     def render(self):
         self.window.fill((0,0,0))
-        x = self.gameState.pos.x
-        y = self.gameState.pos.y
+        x = self.meLocation.x
+        y = self.meLocation.y
         self.location = pygame.math.Vector2(x, y)
 
         self.me_rect = self.window.blit(self.main, self.location)
