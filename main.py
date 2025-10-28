@@ -88,7 +88,7 @@ class Game():
         #loading game over screen
         self.gameover_screen = pygame.image.load('game_over.jpg').convert_alpha()
         #loading background 
-        self.backgound_1 = pygame.image.load('background/109th_update_ Metropolis_28_?.jpg').convert_alpha()
+        self.backgound_1 = pygame.image.load('background/109th_update_Metropolis_28_?.jpg').convert_alpha()
 
         #loading object
         self.main = pygame.image.load('trash assets/recycling 2.png').convert_alpha()
